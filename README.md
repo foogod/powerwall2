@@ -399,9 +399,48 @@ The site_name value can be changed from the Tesla Mobile app settings.
 ---
 #### _GET /api/status_ ####
 
-request: `curl --cacert cacert.pem https://powerwall/api/status`
+| | |
+| ------------------------------------------ | :----: |
+| **Requires Authentication**                | No     |
+| **Can be called when Sitemanager Running** | Yes    |
+| **Request Body Content**                   | (none) |
+| **Response Body Content**                  | JSON   |
+| **Tested Versions**                        | 1.40, 21.39 |
 
-response: `{"start_time":"2019-09-23 23:38:46 +0800","up_time_seconds":"223h5m51.577762169s","is_new":false,"version":"1.40.2","git_hash":"14f7c1769ec307bba2ea62355a09d01c8e58988c+"}`
+This retrives basic information about the system, including the installed software version and type of device.  It can be called prior to any login/authentication (which can be useful to determine the version of the API to use when performing other operations).
+
+| Field               | Type          | API Version | Meaning |
+| ------------------- | ------------- | ----------- | ------- |
+| `din`               | string        | 21.39+ | Device Identification Number (this is the TPN and TSN fields printed on the sticker on the gateway box, separated by a double-dash (`--`)) |
+| `start_time`        | date(non-iso) | 1.40+  | When the system was last restarted.  (Note that unlike most other time values in the APIs, this one is not printed in ISO-8601 format for some reason, but instead has a format of "YYYY-MM-DD hh:mm:ss +ZZZZ".) |
+| `up_time_seconds`   | duration      | 1.40+  | How long the system has been running, in duration string format. |
+| `is_new`            | bool          | 1.40+  |  |
+| `version`           | string        | 1.40+  | Software version number.  Note that older versions just reported the version number by itself, but newer versions return both the version number and short version of the git commit hash, separated by a space. |
+| `git_hash`          | string        | 1.40+  | Full git commit hash associated with this software build |
+| `commission_count`  | int           | 21.39+ |  |
+| `device_type`       | string        | 21.39+ | What type of device this is.  This will always(?) report "teg" for a Tesla Backup Gateway 2. |
+| `sync_type`         | string        | 21.39+ |  |
+| `leader`            | string        | 21.39+ |  |
+| `followers`         | (unknown)     | 21.39+ |  |
+| `cellular_disabled` | bool          | 21.39+ |  |
+
+Sample Response:
+```
+{
+  "din": "1234567-00-E--TG123456789XXX",
+  "start_time": "2021-12-10 16:38:39 +0800",
+  "up_time_seconds": "19h54m16.387599158s",
+  "is_new": false,
+  "version": "21.39.1 7759c368",
+  "git_hash": "7759c368f4e96326389d76703a8a2ae27f091c45",
+  "commission_count": 0,
+  "device_type": "teg",
+  "sync_type": "v2.1",
+  "leader": "",
+  "followers": null,
+  "cellular_disabled": false
+}
+```
 
 Useful here: Gateway Version:  "version":"1.40.2\n"
 
